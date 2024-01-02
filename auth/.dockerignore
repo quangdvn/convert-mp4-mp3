@@ -1,0 +1,10 @@
+/.venv
+/.vscode
+/k8s
+/__pycache__
+
+.pylintrc
+.env
+init.sql
+Pipfile
+Pipfile.lock

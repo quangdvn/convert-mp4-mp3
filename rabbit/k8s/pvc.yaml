@@ -1,0 +1,13 @@
+# Immutable Spec after creating
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: convert-rabbitmq-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Mi
+  storageClassName: standard
+  volumeMode: Filesystem

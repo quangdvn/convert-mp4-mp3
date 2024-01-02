@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: convert-converter
+  labels:
+    app: convert-converter
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: convert-converter
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 8
+  template:
+    metadata:
+      labels:
+        app: convert-converter
+    spec:
+      containers:
+        - name: convert-converter
+          image: quangdvn/convert-converter
+          # resources:
+          #   limits:
+          #     memory: "128Mi"
+          #     cpu: "500m"
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: convert-converter-configmap
+            - secretRef:
+                name: convert-converter-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: convert-converter
+spec:
+  selector:
+    app: convert-converter
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP

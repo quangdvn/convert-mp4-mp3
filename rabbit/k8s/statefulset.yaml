@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: convert-rabbitmq
+spec:
+  selector:
+    matchLabels:
+      app: convert-rabbitmq
+  serviceName: "not-applicable"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: convert-rabbitmq
+    spec:
+      containers:
+        - name: convert-rabbitmq
+          image: rabbitmq:3-management
+          ports:
+            - name: http
+              protocol: TCP
+              containerPort: 15672
+            - name: amqp # Advanced Mess Queueing Protocol
+              protocol: TCP
+              containerPort: 5672
+          envFrom:
+            - configMapRef:
+                name: convert-rabbitmq-configmap
+            - secretRef:
+                name: convert-rabbitmq-secret
+          volumeMounts:
+            - name: convert-rabbitmq-volume
+              mountPath: "/var/lib/rabbitmq"
+      volumes:
+        - name: convert-rabbitmq-volume
+          persistentVolumeClaim:
+            claimName: convert-rabbitmq-pvc
+  # volumeClaimTemplates:
+  #   - metadata:
+  #       name: www
+  #     spec:
+  #       accessModes: ["ReadWriteOnce"]
+  #       resources:
+  #         requests:
+  #           storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: convert-rabbitmq
+spec:
+  type: ClusterIP
+  selector:
+    app: convert-rabbitmq
+  ports:
+    - name: http
+      protocol: TCP
+      port: 15672
+      targetPort: 15672
+    - name: amqp
+      protocol: TCP
+      port: 5672
+      targetPort: 5672

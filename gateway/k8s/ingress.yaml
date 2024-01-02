@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: convert-gateway-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  labels:
+    name: convert-gateway-ingress
+spec:
+  rules:
+    - host: qdvn-mp3-converter.com
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: convert-gateway
+                port:
+                  number: 8080
+          # - pathType: Prefix
+          #   path: "/test"
+          #   backend:
+          #     service:
+          #       name: convert-auth
+          #       port:
+          #         number: 5005

@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: convert-auth
+  labels:
+    app: convert-auth
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: convert-auth
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 3
+  template:
+    metadata:
+      labels:
+        app: convert-auth
+    spec:
+      containers:
+        - name: convert-auth
+          image: quangdvn/convert-auth
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 5005
+          envFrom:
+            - configMapRef:
+                name: convert-auth-configmap
+            - secretRef:
+                name: convert-auth-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: convert-auth
+spec:
+  selector:
+    app: convert-auth
+  type: ClusterIP
+  ports:
+    - port: 5005
+      targetPort: 5005
+      protocol: TCP
